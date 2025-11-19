@@ -1,5 +1,32 @@
+import os
+from flask import Flask, request
+import telebot
+import json
+
 # ——————————————————————————————
-# 1) أمر /start
+# 0) الإعداد الأساسي
+# ——————————————————————————————
+TOKEN = os.environ["BOT_TOKEN"]
+bot = telebot.TeleBot(TOKEN, parse_mode=None)
+
+app = Flask(__name__)
+
+# ——————————————————————————————
+# 1) مسار الويب هوك
+# ——————————————————————————————
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    try:
+        json_str = request.get_data().decode("utf-8")
+        data = json.loads(json_str)
+        update = telebot.types.Update.de_json(data)
+        bot.process_new_updates([update])
+    except Exception as e:
+        print("Webhook Error:", e)
+    return "OK", 200
+
+# ——————————————————————————————
+# 2) أمر /start
 # ——————————————————————————————
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -11,7 +38,7 @@ def start(message):
     )
 
 # ——————————————————————————————
-# 2) أمر /help
+# 3) أمر /help
 # ——————————————————————————————
 @bot.message_handler(commands=['help'])
 def help_cmd(message):
@@ -28,7 +55,7 @@ def help_cmd(message):
     )
 
 # ——————————————————————————————
-# 3) أمر /setup
+# 4) أمر /setup
 # ——————————————————————————————
 @bot.message_handler(commands=['setup'])
 def setup(message):
@@ -41,7 +68,7 @@ def setup(message):
     )
 
 # ——————————————————————————————
-# 4) أمر /platforms
+# 5) أمر /platforms
 # ——————————————————————————————
 @bot.message_handler(commands=['platforms'])
 def platforms(message):
@@ -60,7 +87,7 @@ def platforms(message):
     )
 
 # ——————————————————————————————
-# 5) أمر /accounts
+# 6) أمر /accounts
 # ——————————————————————————————
 @bot.message_handler(commands=['accounts'])
 def accounts(message):
@@ -71,7 +98,7 @@ def accounts(message):
     )
 
 # ——————————————————————————————
-# 6) أمر /schedule
+# 7) أمر /schedule
 # ——————————————————————————————
 @bot.message_handler(commands=['schedule'])
 def schedule(message):
@@ -86,7 +113,7 @@ def schedule(message):
     )
 
 # ——————————————————————————————
-# 7) أمر /summary (ملخص تجريبي)
+# 8) أمر /summary (تجريبي)
 # ——————————————————————————————
 @bot.message_handler(commands=['summary'])
 def summary(message):
@@ -98,3 +125,10 @@ def summary(message):
         "YouTube – محمد:\n- فيديو جديد: 4 دقائق.\n\n"
         "✨ (هذا ملخص تجريبي — سيتم ربط النظام الحقيقي لاحقاً)"
     )
+
+# ——————————————————————————————
+# 9) تشغيل السيرفر
+# ——————————————————————————————
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)

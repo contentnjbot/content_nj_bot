@@ -3,16 +3,16 @@ from flask import Flask, request
 import telebot
 
 TOKEN = os.environ["BOT_TOKEN"]
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, parse_mode=None)
 
 app = Flask(__name__)
 
 # Telegram webhook endpoint
-@app.route(f"/{TOKEN}", methods=["POST"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
-    json_data = request.get_json()
-    if json_data:
-        bot.process_new_updates([telebot.types.Update.de_json(json_data)])
+    json_data = request.get_data().decode("utf-8")
+    update = telebot.types.Update.de_json(json_data)
+    bot.process_new_updates([update])
     return "OK", 200
 
 # test command

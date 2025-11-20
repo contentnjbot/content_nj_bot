@@ -1,10 +1,8 @@
 app = "content-nj-bot"
 
-[env]
+[build]
 
-[http_service]
-  internal_port = 8080
-  force_https = true
+[env]
 
 [[services]]
   internal_port = 8080
@@ -12,5 +10,3 @@ app = "content-nj-bot"
 
   [[services.ports]]
     port = 80
-
-# Procfile يتولى تشغيل Gunicorn — لا تحتاج Processes هنا
